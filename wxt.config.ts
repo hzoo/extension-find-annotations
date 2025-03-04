@@ -11,6 +11,6 @@ export default defineConfig({
   }),
   runner: {
     chromiumArgs: ["--user-data-dir=./.wxt/chrome-data"],
-    startUrls: ["https://henryzoo.com"]
+    startUrls: ["https://x.com"]
   }
 });

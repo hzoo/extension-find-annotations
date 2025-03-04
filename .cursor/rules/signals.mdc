@@ -17,8 +17,6 @@ use computed within components to save re-renders
 
 ```ts
 function Word({ word }: { word: { text: string, index: number } }) {
-  useSignals();
-  
   const isCurrent = useComputed(() => currentWordIndex.value === word.index);
 
   return (

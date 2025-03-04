@@ -3,7 +3,7 @@ import App from "@/components/App";
 import "@/assets/tailwind.css";
 
 export default defineContentScript({
-  matches: ["*://*/*"],
+  matches: ["https://x.com/*"],
   cssInjectionMode: "ui",
 
   async main(ctx) {
@@ -11,7 +11,7 @@ export default defineContentScript({
       name: "x-scroll-dl-ui",
       position: "inline",
       anchor: "body",
-      append: "first",
+      append: "last",
       onMount: (container) => {
         const wrapper = document.createElement("div");
         container.append(wrapper);

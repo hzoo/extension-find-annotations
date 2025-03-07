@@ -1,10 +1,14 @@
 import { signal } from "@preact/signals";
 import { useEffect } from "preact/hooks";
 import { findTweetsForUrl } from "@/lib/supabase";
-import { Tweet as TweetComponent, LoadingTweet } from "@/components/Tweet";
+import { Tweet as TweetComponent } from "@/components/Tweet";
+import LoadingTweet from "@/components/LoadingTweet";
 import type { Tweet } from "@/lib/types";
 import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
+import { displayMode } from "@/lib/pushMode";
+import { sidebarClasses as sc } from "@/lib/styles/sidebar";
 import "./styles.css";
+import { PushModeToggle } from "@/components/PushModeToggle";
 
 const tweets = signal<Tweet[]>([]);
 const loading = signal(false);
@@ -57,29 +61,33 @@ export function Sidebar() {
           transform: isCollapsed.value ? 'translateX(100%)' : 'translateX(0)',
           transition: 'transform 300ms ease-in-out'
         }}
-        class="fixed top-0 right-0 h-screen w-[450px] bg-white dark:bg-gray-900 border-l-2 border-solid border-l-gray-200 dark:border-l-gray-700 overflow-y-auto z-[9999]"
+        class={`h-screen w-[450px] border-l-2 border-solid border-l-gray-200 dark:border-l-gray-700 overflow-y-auto transition-all duration-300 bg-white dark:bg-gray-900 ${sc.mode[displayMode.value]}`}
+        data-display-mode={displayMode.value}
       >
         <div class="sticky top-0 z-10 p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
               Related Tweets {tweets.value.length > 0 && `(${tweets.value.length})`}
             </h2>
-            <button 
-              onClick={toggleCollapsed} 
-              class="p-1.5 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors"
-              title={`${isCollapsed.value ? "Expand" : "Collapse"} sidebar (Alt+T)`}
-              aria-label={`${isCollapsed.value ? "Expand" : "Collapse"} sidebar (Alt+T)`}
-            >
-              <svg viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
-                <path 
-                  fill="currentColor" 
-                  d={isCollapsed.value 
-                    ? "M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6l-6 6l-1.41-1.41z"
-                    : "M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6l6 6l1.41-1.41z"
-                  }
-                />
-              </svg>
-            </button>
+            <div class="flex gap-2">
+              <PushModeToggle />
+              <button 
+                onClick={toggleCollapsed} 
+                class="p-1.5 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 transition-colors"
+                title={`${isCollapsed.value ? "Expand" : "Collapse"} sidebar (Alt+T)`}
+                aria-label={`${isCollapsed.value ? "Expand" : "Collapse"} sidebar (Alt+T)`}
+              >
+                <svg viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+                  <path 
+                    fill="currentColor" 
+                    d={isCollapsed.value 
+                      ? "M8.59 16.59L13.17 12L8.59 7.41L10 6l6 6l-6 6l-1.41-1.41z"
+                      : "M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6l6 6l1.41-1.41z"
+                    }
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 

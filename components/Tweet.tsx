@@ -1,5 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { useSignal } from "@preact/signals";
+
+import LoadingTweet from "@/components/LoadingTweet";
 import { supabase } from "@/lib/supabase";
 import { getUserData, setUserData } from "@/lib/userCache";
 import { getExpandedUrl } from "@/lib/urlCache";
@@ -37,11 +39,8 @@ function linkify(text: string) {
     
     // If we have an expanded URL for this t.co URL, use it
     const expandedUrl = getExpandedUrl(cleanUrl);
-    if (expandedUrl) {
-      return `<a href="${expandedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${expandedUrl}</a>${hasClosingParen ? ')' : ''}`;
-    }
-    
-    return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${cleanUrl}</a>${hasClosingParen ? ')' : ''}`;
+    const linkUrl = expandedUrl ? expandedUrl : cleanUrl;
+    return `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${linkUrl}</a>${hasClosingParen ? ')' : ''}`;
   });
 
   // Replace @mentions
@@ -50,21 +49,6 @@ function linkify(text: string) {
   );
 
   return html;
-}
-
-export function LoadingTweet() {
-  return (
-    <div class="p-3 border-b border-gray-100 dark:border-gray-800">
-      <div class="flex gap-2">
-        <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
-        <div class="flex-1 space-y-2">
-          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/5" />
-          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-full" />
-          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-2/5" />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function Tweet({ tweet }: TweetProps) {

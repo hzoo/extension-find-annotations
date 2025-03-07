@@ -4,7 +4,7 @@ import type { TweetData } from "@/lib/signals";
 
 // A dedicated component for rendering the list of tweets
 // Memoized to prevent unnecessary re-renders
-const TweetList = memo(({ tweets }: { tweets: TweetData[] }) => {
+export const TweetList = memo(({ tweets }: { tweets: TweetData[] }) => {
   if (tweets.length === 0) {
     return null;
   }
@@ -16,6 +16,4 @@ const TweetList = memo(({ tweets }: { tweets: TweetData[] }) => {
       ))}
     </div>
   );
-});
-
-export default TweetList; 
+}); 

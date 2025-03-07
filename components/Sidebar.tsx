@@ -32,8 +32,9 @@ export function Sidebar() {
     return <EmptyTweets />;
   }
 
+  // Simplified structure without unnecessary background colors
   return (
-    <div class="flex flex-col h-full bg-white dark:bg-gray-900">
+    <div class="flex flex-col h-full">
       <SidebarHeader />
 
       <div class="flex-1 overflow-y-auto">

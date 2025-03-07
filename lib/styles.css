@@ -1,22 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-  --color-secondary-dark: oklch(0.24 0.02 264.05); /* similar to discord dark theme */
+  --color-bg: white;
+  --color-bg-dark: #111827;
+  --color-text: #1a202c;
+  --color-text-dark: #f3f4f6;
+}
+
+/* Essential layout styles */
+html, body, #app {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base container styling with dark mode support */
+#app {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  #app {
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-dark);
+  }
 }
 
 /* Fix the linter error for dangerouslySetInnerHTML in Tweet component */
 .tweet-text a {
   @apply text-blue-500 hover:underline;
-}
-
-/* Add animations for loading state */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 0.3;
-  }
 }
 
 /* Add any custom components that aren't easily done in Tailwind */

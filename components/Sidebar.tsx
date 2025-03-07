@@ -3,6 +3,7 @@ import { useEffect } from "preact/hooks";
 import { findTweetsForUrl } from "@/lib/supabase";
 import { Tweet as TweetComponent, LoadingTweet } from "@/components/Tweet";
 import type { Tweet } from "@/lib/types";
+import { useKeyboardShortcuts } from "@/lib/hooks/useKeyboardShortcuts";
 import "./styles.css";
 
 const tweets = signal<Tweet[]>([]);
@@ -40,24 +41,24 @@ export function Sidebar() {
     fetchTweets();
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Alt/Option + T to toggle sidebar
-      if (e.altKey && e.key === '†') {
-        e.preventDefault();
-        toggleCollapsed();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  useKeyboardShortcuts([
+    {
+      combo: { key: "KeyT", altKey: true },
+      callback: () => toggleCollapsed()
+    }
+  ]);
 
   if (!tweets.value.length && !loading.value) return null;
 
   return (
     <>
-      <div class={`fixed top-0 right-0 h-screen w-[450px] bg-white dark:bg-gray-900 shadow-md border-l border-gray-200 dark:border-gray-800 overflow-y-auto z-[9999] transition-transform duration-300 ${isCollapsed.value ? 'translate-x-full' : ''}`}>
+      <div 
+        style={{
+          transform: isCollapsed.value ? 'translateX(100%)' : 'translateX(0)',
+          transition: 'transform 300ms ease-in-out'
+        }}
+        class="fixed top-0 right-0 h-screen w-[450px] bg-white dark:bg-gray-900 border-l-2 border-solid border-l-gray-200 dark:border-l-gray-700 overflow-y-auto z-[9999]"
+      >
         <div class="sticky top-0 z-10 p-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur border-b border-gray-200 dark:border-gray-800">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">

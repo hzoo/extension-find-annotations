@@ -9,8 +9,9 @@ export default defineConfig({
     name: "Find Annotations",
     description: "Find annotations",
     version: "0.0.1",
-    permissions: ['storage', 'tabs'],
+    permissions: ['storage', 'tabs', 'sidePanel'],
     host_permissions: ["<all_urls>"],
+    action: {}, // Required for sidepanel to open on action click
   },
   extensionApi: 'chrome',
   vite: () => ({

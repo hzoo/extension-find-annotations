@@ -1,20 +1,12 @@
 import { useEffect } from "preact/hooks";
 import { useSignal } from "@preact/signals";
+import { memo } from "preact/compat";
 
-import LoadingTweet from "@/components/LoadingTweet";
+import {LoadingTweet} from "@/components/LoadingTweet";
 import { supabase } from "@/lib/supabase";
 import { getUserData, setUserData } from "@/lib/userCache";
 import { getExpandedUrl } from "@/lib/urlCache";
-import "./styles.css";
-
-interface TweetProps {
-  tweet: {
-    tweet_id: string;
-    full_text: string;
-    created_at: string;
-    account_id: string;
-  };
-}
+import type { TweetData } from "@/lib/signals";
 
 function linkify(text: string) {
   // Handle URLs
@@ -51,7 +43,8 @@ function linkify(text: string) {
   return html;
 }
 
-export function Tweet({ tweet }: TweetProps) {
+// Memoize the Tweet component to prevent unnecessary re-renders
+export const Tweet = memo(function TweetComponent({ tweet }: { tweet: TweetData }) {
   const userData = useSignal<{
     username: string;
     displayName: string;
@@ -142,4 +135,4 @@ export function Tweet({ tweet }: TweetProps) {
       </div>
     </a>
   );
-} 
+}); 

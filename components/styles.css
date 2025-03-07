@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+  --color-secondary-dark: oklch(0.24 0.02 264.05); /* similar to discord dark theme */
+}
+
+/* Fix the linter error for dangerouslySetInnerHTML in Tweet component */
+.tweet-text a {
+  @apply text-blue-500 hover:underline;
+}
+
+/* Add animations for loading state */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Add any custom components that aren't easily done in Tailwind */
+@layer components {
+  .tweet-highlight {
+    @apply bg-yellow-100 dark:bg-yellow-500/30;
+  }
+} 

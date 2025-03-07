@@ -1,6 +1,6 @@
 {
-  "name": "x-scroll-dl",
-  "description": "X Scroll DL",
+  "name": "extension-find-annotations",
+  "description": "Find annotations",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,12 +16,14 @@
   },
   "dependencies": {
     "@preact/signals": "^2.0.1",
+    "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/vite": "^4.0.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
+    "@types/bun": "^1.2.4",
     "@types/chrome": "^0.0.307",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",

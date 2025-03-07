@@ -1,11 +1,9 @@
 import { render } from "preact";
 import App from "@/components/App";
-import "@/assets/tailwind.css";
 
 export default defineContentScript({
-  matches: ["https://x.com/*"],
+  matches: ["<all_urls>"],
   cssInjectionMode: "ui",
-
   async main(ctx) {
     const ui = await createShadowRootUi(ctx, {
       name: "x-scroll-dl-ui",
@@ -17,10 +15,10 @@ export default defineContentScript({
         container.append(wrapper);
 
         render(<App />, wrapper);
-        return { wrapper };
+        return wrapper;
       },
       onRemove: (elements) => {
-        elements?.wrapper.remove();
+        elements?.remove();
       },
     });
 

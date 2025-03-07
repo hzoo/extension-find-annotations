@@ -1,11 +1,9 @@
-import { TweetObserver } from '@/components/TweetObserver';
-import { DebugView } from '@/components/DebugView';
+import { Sidebar } from "@/components/Sidebar";
 
 export default function App() {
   return (
-    <div className="x-scroll-dl-app">
-      <TweetObserver />
-      <DebugView />
+    <div className="extension-find-annotations">
+      <Sidebar/>
     </div>
   );
 } 

@@ -30,9 +30,9 @@ html, body, #app {
 }
 
 /* Fix the linter error for dangerouslySetInnerHTML in Tweet component */
-.tweet-text a {
+/* .tweet-text a {
   @apply text-blue-500 hover:underline;
-}
+} */
 
 /* Add any custom components that aren't easily done in Tailwind */
 @layer components {

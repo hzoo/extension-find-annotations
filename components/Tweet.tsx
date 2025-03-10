@@ -26,15 +26,15 @@ interface ExtendedTweetData extends TweetData {
   verified?: boolean;
 }
 
-// Helper function to clean URLs for display
 function cleanUrlForDisplay(url: string, maxLength = 25): string {
-  return url
-    // Remove protocol (http://, https://)
+  const cleaned = url
     .replace(/^https?:\/\//, '')
-    // Remove www. prefix
     .replace(/^www\./, '')
-    // Truncate if too long
-    .slice(0, maxLength) + (url.length > maxLength ? '...' : '');
+    .replace(/\/$/, ''); // remove ending slash
+  if (cleaned.length > maxLength) {
+    return `${cleaned.slice(0, maxLength - 3)}...`;
+  }
+  return cleaned;
 }
 
 // Convert text with URLs and usernames to HTML with links

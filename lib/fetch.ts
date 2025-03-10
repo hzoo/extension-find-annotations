@@ -2,6 +2,7 @@ import { tweets } from "@/lib/signals";
 import { debounce } from "@/lib/debounce";
 import { error } from "@/lib/signals";
 import { loading } from "@/lib/signals";
+import { tweetsSourceUrl } from "@/lib/signals";
 import { currentUrl } from "@/lib/messaging";
 import { findTweetsForUrl } from "@/lib/supabase";
 
@@ -25,6 +26,7 @@ export async function fetchTweetsImpl() {
       // Only update tweets if they've actually changed
       if (JSON.stringify(tweets.value) !== JSON.stringify(results)) {
         tweets.value = results;
+        tweetsSourceUrl.value = currentUrl.value; // Store the URL that these tweets are from
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch tweets';

@@ -10,3 +10,4 @@ export interface TweetData {
 export const tweets = signal<TweetData[]>([]);
 export const loading = signal(false);
 export const error = signal<string | null>(null);
+export const tweetsSourceUrl = signal<string>("");

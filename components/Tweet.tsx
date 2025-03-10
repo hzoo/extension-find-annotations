@@ -26,6 +26,17 @@ interface ExtendedTweetData extends TweetData {
   verified?: boolean;
 }
 
+// Helper function to clean URLs for display
+function cleanUrlForDisplay(url: string, maxLength = 25): string {
+  return url
+    // Remove protocol (http://, https://)
+    .replace(/^https?:\/\//, '')
+    // Remove www. prefix
+    .replace(/^www\./, '')
+    // Truncate if too long
+    .slice(0, maxLength) + (url.length > maxLength ? '...' : '');
+}
+
 // Convert text with URLs and usernames to HTML with links
 function linkify(text: string) {
   // Create a combined regex that captures both URLs and usernames
@@ -69,25 +80,14 @@ function linkify(text: string) {
         // If we have an expanded URL for this t.co URL, use it
         const expandedUrl = getExpandedUrl(trimmedUrl);
         if (expandedUrl) {
-          return `<a href="${expandedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${expandedUrl}</a>`;
+          const displayUrl = cleanUrlForDisplay(expandedUrl);
+          return `<a href="${expandedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${displayUrl}</a>`;
         }
         // If no expanded URL is available, don't show the t.co URL
         return '';
       }
       
-      // Clean up the display text for the URL
-      let displayUrl = trimmedUrl
-        // Remove protocol (http://, https://)
-        .replace(/^https?:\/\//, '')
-        // Remove www. prefix
-        .replace(/^www\./, '');
-      
-      // Simple truncation for long URLs
-      const MAX_URL_LENGTH = 25;
-      if (displayUrl.length > MAX_URL_LENGTH) {
-        displayUrl = `${displayUrl.substring(0, MAX_URL_LENGTH)}...`;
-      }
-      
+      const displayUrl = cleanUrlForDisplay(trimmedUrl);
       return `<a href="${trimmedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${displayUrl}</a>`;
     }
     

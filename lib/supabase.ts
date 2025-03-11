@@ -40,7 +40,7 @@ export async function findTweetsForUrl(url: string) {
     // Then get the full tweet data
     const { data: tweets, error: tweetsError } = await supabase
       .from('tweets')
-      .select('*')
+      .select('tweet_id, full_text, created_at, account_id, reply_to_tweet_id, reply_to_user_id, reply_to_username, updated_at')
       .in('tweet_id', tweetIds)
       .order('created_at', { ascending: false });
 

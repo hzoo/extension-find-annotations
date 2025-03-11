@@ -21,14 +21,14 @@ export interface TweetData {
 	full_text: string;
 	created_at: string;
 	account_id: string;
-	archive_upload_id: number;
-	fts: string;
+	// archive_upload_id: number;
+	// fts: string;
 	reply_to_tweet_id: string | null;
 	reply_to_user_id: string | null;
 	reply_to_username: string | null;
-	retweet_count: number;
+	// retweet_count: number;
 	updated_at: string;
-	favorite_count: number;
+	// favorite_count: number;
 	type?: TweetType; // added by processTweets
 }
 

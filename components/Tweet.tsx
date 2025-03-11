@@ -87,7 +87,7 @@ function linkify(text: string) {
     if (originalMatch.startsWith('@')) {
       // Extract just the username without the @ symbol
       const usernameWithoutAt = originalMatch.substring(1);
-      return `<a href="https://x.com/${usernameWithoutAt}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">${originalMatch}</a>`;
+      return `<a href="https://x.com/${usernameWithoutAt}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${originalMatch}</a>`;
     }
     
     // This should never happen, but return the original match just in case
@@ -188,7 +188,7 @@ const TweetContent = ({
           </span>
           {isReply && (
             <span 
-              class="hover:underline cursor-pointer text-blue-600"
+              class="hover:underline cursor-pointer text-blue-500"
               title={replyMentions}
             >
               {replyMentions.split(/\s+/).length > 1 

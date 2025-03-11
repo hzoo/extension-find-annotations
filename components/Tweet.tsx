@@ -131,22 +131,6 @@ function processReplyMentions(text: string): {
   };
 }
 
-// Highlight search terms in text
-function highlightText(text: string, query: string) {
-  if (!query) return linkify(text);
-
-  const linkedText = linkify(text);
-  const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-  // Use a non-greedy match to avoid matching across HTML tags
-  const regex = new RegExp(`(${safeQuery})(?![^<]*>)`, "gi");
-
-  return linkedText.replace(
-    regex,
-    '<mark class="bg-yellow-200 dark:bg-yellow-500/80 px-0.5 rounded">$1</mark>',
-  );
-}
-
 // Format tweet date
 function formatTweetDate(dateString: number | string) {
   const date = new Date(dateString);
@@ -163,12 +147,10 @@ function formatTweetDate(dateString: number | string) {
 // TweetContent component to handle the content part of a tweet
 const TweetContent = ({ 
   full_text, 
-  queryText = '',
   extended_entities,
   tweetType,
 }: { 
   full_text: string; 
-  queryText?: string;
   extended_entities?: ExtendedEntities;
   tweetType?: TweetType;
 }) => {
@@ -225,7 +207,7 @@ const TweetContent = ({
           ${tweetType === 'retweet' ? 'italic text-gray-700 dark:text-gray-300' : ''}`}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: Required for rendering tweet with links
         dangerouslySetInnerHTML={{
-          __html: highlightText(isReply ? mainText : full_text, queryText),
+          __html: linkify(isReply ? mainText : full_text),
         }}
       />
       
@@ -281,7 +263,7 @@ function getTweetHoverClass(tweetType?: TweetType) {
 }
 
 // Memoize the Tweet component to prevent unnecessary re-renders
-export const Tweet = memo(function TweetComponent({ tweet, queryText = '' }: { tweet: ExtendedTweetData; queryText?: string }) {
+export const Tweet = memo(function TweetComponent({ tweet }: { tweet: ExtendedTweetData }) {
   const userData = useSignal<{
     username: string;
     displayName: string;
@@ -388,7 +370,6 @@ export const Tweet = memo(function TweetComponent({ tweet, queryText = '' }: { t
         <div class="w-full">
           <TweetContent 
             full_text={tweet.full_text} 
-            queryText={queryText}
             extended_entities={tweet.extended_entities}
             tweetType={tweet.type}
           />

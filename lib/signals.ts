@@ -85,12 +85,22 @@ export function processTweets(tweetData: TweetData[], tweetUrls?: TweetUrl[]): T
 		const type = determineTweetType(tweet);
 		const urls = urlsByTweetId.get(tweet.tweet_id) || [];
 		
+		// Replace t.co URLs in the tweet text with their expanded versions
+		let processedText = tweet.full_text;
+		urls.forEach(({ url, expanded_url }) => {
+			if (url.includes('t.co/')) {
+				// Use a regex that matches the URL with optional punctuation at the end
+				const urlRegex = new RegExp(`${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[.,;:]*`, 'g');
+				processedText = processedText.replace(urlRegex, expanded_url);
+			}
+		});
+		
 		// If we have URLs and it's not already classified as something else,
 		// check if any of the URLs are to twitter.com/*/status/* which would indicate a quote tweet
 		if (type === TweetType.STANDALONE && urls.some(url => isTwitterStatusUrl(url.expanded_url))) {
-			return { ...tweet, type: TweetType.QUOTE_RETWEET };
+			return { ...tweet, full_text: processedText, type: TweetType.QUOTE_RETWEET };
 		}
 		
-		return { ...tweet, type };
+		return { ...tweet, full_text: processedText, type };
 	});
 }

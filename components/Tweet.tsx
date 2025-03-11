@@ -79,19 +79,6 @@ function linkify(text: string) {
     // Check if it's a URL
     if (originalMatch.startsWith('http')) {
       const trimmedUrl = originalMatch.replace(/[.,;:]$/, "");
-      
-      // Handle t.co URLs
-      if (trimmedUrl.includes('t.co/')) {
-        // If we have an expanded URL for this t.co URL, use it
-        const expandedUrl = getExpandedUrl(trimmedUrl);
-        if (expandedUrl) {
-          const displayUrl = cleanUrlForDisplay(expandedUrl);
-          return `<a href="${expandedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${displayUrl}</a>`;
-        }
-        // If no expanded URL is available, don't show the t.co URL
-        return '';
-      }
-      
       const displayUrl = cleanUrlForDisplay(trimmedUrl);
       return `<a href="${trimmedUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline">${displayUrl}</a>`;
     }

@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals";
-import { setExpandedUrls, isTwitterStatusUrl } from "./urlCache";
+import { isTwitterStatusUrl } from "./urlCache";
 
 export interface TweetUrl {
 	tweet_id: string;
@@ -69,11 +69,8 @@ export function determineTweetType(tweet: TweetData): TweetType {
 export function processTweets(tweetData: TweetData[], tweetUrls?: TweetUrl[]): TweetData[] {
 	const urlsByTweetId = new Map<string, TweetUrl[]>();
 	
-	// Update URL cache if we have new URL data
+	// Group URLs by tweet_id for efficient lookup
 	if (tweetUrls?.length) {
-		setExpandedUrls(tweetUrls);
-		
-		// Group URLs by tweet_id for efficient lookup
 		tweetUrls.forEach(url => {
 			const urls = urlsByTweetId.get(url.tweet_id) || [];
 			urls.push(url);

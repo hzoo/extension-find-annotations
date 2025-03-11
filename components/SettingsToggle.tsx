@@ -1,6 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { autoFetchEnabled, toggleAutoFetch } from "@/lib/settings";
 import { useEffect, useRef } from "preact/hooks";
+import CacheStats from "@/components/CacheStats";
 
 export function SettingsToggle() {
   const isOpen = useSignal(false);
@@ -81,11 +82,16 @@ export function SettingsToggle() {
                 }`} />
               </label>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-4">
               {autoFetchEnabled.value
                 ? "Tweets will be automatically fetched when you visit a page."
                 : "For privacy, tweets will only be fetched when you click the refresh button."}
             </p>
+            
+            {/* Cache Statistics */}
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <CacheStats />
+            </div>
           </div>
         </div>
       )}

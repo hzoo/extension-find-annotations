@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 // import { setExpandedUrls } from '@/lib/urlCache';
-import { processTweets } from "./signals";
+import { processTweets, loading } from './signals';
+import { cacheTweets, getCachedTweets, isCacheStale } from './urlCache';
 
 // Supabase setup
 // const supabaseUrl = import.meta.env.VITE_LOCAL_SUPABASE_URL;
@@ -10,9 +11,18 @@ const supabaseKey = import.meta.env.VITE_PUBLIC_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-export async function findTweetsForUrl(url: string) {
+export async function findTweetsForUrl(url: string, forceRefresh = false) {
   try {
     console.log("[Tweet Finder] Searching for URL:", url);
+
+    // Check cache first if we're not forcing a refresh
+    if (!forceRefresh) {
+      const cached = getCachedTweets(url);
+      if (cached && !isCacheStale(url)) {
+        console.log("[Tweet Finder] Using cached tweets from", new Date(cached.timestamp).toLocaleString());
+        return cached.tweets;
+      }
+    }
 
     // Try both with and without trailing slash
     const hasSlash = url.endsWith('/');
@@ -30,6 +40,8 @@ export async function findTweetsForUrl(url: string) {
 
     if (!urlData?.length) {
       console.log("[Tweet Finder] No tweets found with this URL");
+      // Cache empty results too
+      cacheTweets(url, []);
       return [];
     }
 
@@ -43,13 +55,17 @@ export async function findTweetsForUrl(url: string) {
       .select('tweet_id, full_text, created_at, account_id, reply_to_tweet_id, reply_to_user_id, reply_to_username, updated_at')
       .in('tweet_id', tweetIds)
       .order('created_at', { ascending: false });
-
+      
     if (tweetsError) throw tweetsError;
     
-    console.log("[Tweet Finder] Found tweets:", tweets);
-    return processTweets(tweets || [], urlData || []);
-  } catch (err) {
-    console.error("[Tweet Finder] Error fetching tweets:", err);
+    const processedTweets = processTweets(tweets || [], urlData);
+    
+    // Cache the results
+    cacheTweets(url, processedTweets);
+    
+    return processedTweets;
+  } catch (error) {
+    console.error("[Tweet Finder] Error finding tweets:", error);
     return [];
   }
 } 

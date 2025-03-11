@@ -3,6 +3,8 @@ import { tweetsSourceUrl } from "@/lib/signals";
 import { fetchTweetsImpl } from "@/lib/fetch";
 import { useSignal } from "@preact/signals";
 import { useSignalEffect } from "@preact/signals";
+import { getCachedTweets } from "@/lib/urlCache";
+import { autoFetchEnabled } from "@/lib/settings";
 
 export function TweetSourceNotification() {
   // Keep track of whether to show the notification
@@ -10,8 +12,17 @@ export function TweetSourceNotification() {
   
   // Update the showNotification signal when relevant values change
   useSignalEffect(() => {
-    if (tweetsSourceUrl.value && currentUrl.value && 
-        tweetsSourceUrl.value !== currentUrl.value) {
+    const currentUrlValue = currentUrl.value;
+    // Only show notification if:
+    // 1. We have a current URL
+    // 2. Auto-fetch is disabled
+    // 3. There's no cached data for this URL
+    // 4. The current tweets are from a different URL
+    if (currentUrlValue && 
+        !autoFetchEnabled.value && 
+        !getCachedTweets(currentUrlValue) &&
+        tweetsSourceUrl.value && 
+        tweetsSourceUrl.value !== currentUrlValue) {
       showNotification.value = true;
     } else {
       showNotification.value = false;

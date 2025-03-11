@@ -10,13 +10,13 @@ import { tweets, loading, error } from "@/lib/signals";
 import { fetchTweets, fetchTweetsImpl } from "@/lib/fetch";
 import { autoFetchEnabled } from "@/lib/settings";
 import { TweetSourceNotification } from "@/components/TweetSourceNotification";
+import CacheStatus from "@/components/CacheStatus";
+import { getCachedTweets } from "@/lib/urlCache";
 
 function SidebarBody() {
-	// Keep track of if this is the first load
-	const isFirstLoad = useRef(true);
 	const lastUrl = useRef(currentUrl.value);
 
-	// Load tweets on first render and when URL changes, with debounce
+	// Load tweets when URL changes, with debounce
 	useSignalEffect(() => {
 		const newUrl = currentUrl.value;
 		
@@ -24,24 +24,25 @@ function SidebarBody() {
 		if (newUrl !== lastUrl.current) {
 			lastUrl.current = newUrl;
 			
-			// If auto-fetch is enabled, fetch the tweets
-			if (newUrl && autoFetchEnabled.value) {
-				// On first load, fetch immediately
-				if (isFirstLoad.current) {
-					isFirstLoad.current = false;
-					fetchTweetsImpl(); // Use non-debounced version for initial load
-				} else {
-					// For subsequent URL changes, use debounced version
+			if (newUrl) {
+				// First check if we have cached data
+				const cachedData = getCachedTweets(newUrl);
+				
+				if (cachedData) {
+					// If we have cached data, always load it regardless of autoFetchEnabled
+					tweets.value = cachedData.tweets;
+					error.value = null;
+				} else if (autoFetchEnabled.value) {
+					// Only fetch from Supabase if auto-fetch is enabled and we don't have cache
 					fetchTweets();
 				}
+				// If no cache and auto-fetch disabled, user will see TweetSourceNotification
 			}
-			// If auto-fetch is disabled, we don't fetch automatically
-			// The user will see the TweetSourceNotification to fetch manually
 		}
 	});
 
 	return (
-		<div class="flex-1 overflow-y-auto">
+		<div className="flex-1 overflow-y-auto">
 			{loading.value ? (
 				<LoadingTweetList />
 			) : error.value ? (
@@ -56,9 +57,12 @@ function SidebarBody() {
 export function Sidebar() {
 	// Simplified structure without unnecessary background colors
 	return (
-		<div class="flex flex-col h-full">
+		<div className="flex flex-col h-full">
 			<SidebarHeader />
 			<TweetSourceNotification />
+			<div className="px-3 py-2 border-b border-gray-200 dark:border-gray-800">
+				<CacheStatus />
+			</div>
 			{tweets.value.length === 0 && !loading.value && <EmptyTweets />}
 			<SidebarBody />
 		</div>

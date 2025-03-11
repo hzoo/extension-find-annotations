@@ -1,10 +1,10 @@
 import { fetchTweetsImpl } from "@/lib/fetch";
 
-export function ManualFetchButton() {
-  const handleFetch = () => {
-    fetchTweetsImpl();
-  };
+const handleFetch = () => {
+  fetchTweetsImpl();
+};
 
+export function ManualFetchButton() {
   return (
     <button
       className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 rounded-md text-sm font-medium transition-colors"

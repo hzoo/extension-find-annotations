@@ -2,7 +2,7 @@
   "name": "extension-find-annotations",
   "description": "Find annotations",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -12,7 +12,8 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "release": "bun scripts/release.ts"
   },
   "dependencies": {
     "@preact/signals": "^2.0.1",

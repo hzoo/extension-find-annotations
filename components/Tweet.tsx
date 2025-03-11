@@ -5,7 +5,6 @@ import { memo } from "preact/compat";
 import {LoadingTweet} from "@/components/LoadingTweet";
 import { supabase } from "@/lib/supabase";
 import { getUserData, setUserData } from "@/lib/userCache";
-import { getExpandedUrl } from "@/lib/urlCache";
 import type { TweetData, TweetType } from "@/lib/signals";
 
 // Define types for extended entities and media

@@ -1,6 +1,7 @@
 import { defineConfig } from 'wxt';
 import tailwindcss from "@tailwindcss/vite";
 import preact from "@preact/preset-vite";
+import svgr from 'vite-plugin-svgr'
 // import react from "@vitejs/plugin-react-swc";
 
 // See https://wxt.dev/api/config.html
@@ -16,7 +17,7 @@ export default defineConfig({
   },
   extensionApi: 'chrome',
   vite: () => ({
-    plugins: [preact(), tailwindcss()],
+    plugins: [preact(), tailwindcss(), svgr()],
   }),
   runner: {
     chromiumArgs: ["--user-data-dir=./.wxt/chrome-data"],

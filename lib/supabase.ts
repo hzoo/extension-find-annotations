@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import { setExpandedUrls } from '@/lib/urlCache';
+// import { setExpandedUrls } from '@/lib/urlCache';
+import { processTweets } from "./signals";
 
 // Supabase setup
 // const supabaseUrl = import.meta.env.VITE_LOCAL_SUPABASE_URL;
@@ -36,11 +37,6 @@ export async function findTweetsForUrl(url: string) {
     const tweetIds = urlData.map(d => d.tweet_id);
     // console.log("[Tweet Finder] Found tweet IDs:", tweetIds);
 
-    // Cache all URLs
-    if (urlData) {
-      setExpandedUrls(urlData);
-    }
-
     // Then get the full tweet data
     const { data: tweets, error: tweetsError } = await supabase
       .from('tweets')
@@ -51,7 +47,7 @@ export async function findTweetsForUrl(url: string) {
     if (tweetsError) throw tweetsError;
     
     console.log("[Tweet Finder] Found tweets:", tweets);
-    return tweets || [];
+    return processTweets(tweets || [], urlData || []);
   } catch (err) {
     console.error("[Tweet Finder] Error fetching tweets:", err);
     return [];

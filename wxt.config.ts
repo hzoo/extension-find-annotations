@@ -9,7 +9,7 @@ export default defineConfig({
   manifest: {
     name: "Find Annotations",
     description: "Find annotations",
-    version: "0.0.1",
+    version: "0.0.2",
     // https://developer.chrome.com/docs/extensions/reference/api/sidePanel
     permissions: ['storage', 'tabs', 'sidePanel'],
     // host_permissions: ["<all_urls>"],

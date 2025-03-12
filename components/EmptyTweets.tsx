@@ -1,7 +1,22 @@
-import { autoFetchEnabled } from "@/lib/settings";
+import { autoFetchEnabled, extractBaseDomain, isDomainWhitelisted } from "@/lib/settings";
 import { ManualFetchButton } from "@/components/ManualFetchButton";
+import { WhitelistButton } from "@/components/WhitelistButton";
+import { useSignal, useComputed } from "@preact/signals";
 
 export function EmptyTweets() {
+  const currentDomain = useSignal("");
+
+  // Get current domain on mount
+  chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+    if (tab.url) {
+      currentDomain.value = extractBaseDomain(tab.url);
+    }
+  });
+
+  const isWhitelisted = useComputed(() => 
+    isDomainWhitelisted(currentDomain.value)
+  );
+
   return (
     <div className="h-full flex flex-col items-center justify-center p-6 text-center">
       <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-3 mb-4">
@@ -26,9 +41,18 @@ export function EmptyTweets() {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
             No tweets found
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            We couldn't find any tweets for this page.
-          </p>
+          {isWhitelisted.value ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              We couldn't find any tweets for this page.
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Auto-fetch is enabled but this site isn't whitelisted. Add it to the whitelist to automatically fetch tweets.
+              </p>
+              <WhitelistButton />
+            </>
+          )}
         </>
       ) : (
         <>

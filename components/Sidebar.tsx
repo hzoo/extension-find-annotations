@@ -8,7 +8,7 @@ import { SidebarHeader } from "@/components/SidebarHeader";
 import { EmptyTweets } from "@/components/EmptyTweets";
 import { tweets, loading, error, tweetsSourceUrl } from "@/lib/signals";
 import { fetchTweets, fetchTweetsImpl } from "@/lib/fetch";
-import { autoFetchEnabled } from "@/lib/settings";
+import { autoFetchEnabled, extractBaseDomain, isDomainWhitelisted } from "@/lib/settings";
 import { TweetSourceNotification } from "@/components/TweetSourceNotification";
 import CacheStatus from "@/components/CacheStatus";
 import { getCachedTweets } from "@/lib/urlCache";
@@ -27,12 +27,12 @@ function SidebarBody() {
 				tweetsSourceUrl.value = newUrl;
 				tweets.value = cachedData.tweets;
 				error.value = null;
-			} else if (autoFetchEnabled.value) {
-				// Only fetch from Supabase if auto-fetch is enabled and we don't have cache
+			} else if (autoFetchEnabled.value && isDomainWhitelisted(extractBaseDomain(newUrl))) {
+				// Only fetch if auto-fetch is enabled AND domain is whitelisted
 				tweetsSourceUrl.value = newUrl;
 				fetchTweets();
 			}
-			// If no cache and auto-fetch disabled, user will see TweetSourceNotification
+			// If no cache and auto-fetch disabled or not whitelisted, user will see TweetSourceNotification
 		}
 	});
 

@@ -29,7 +29,7 @@ signals usage
 
 ```ts
 // top-level signals  
-import { signal } from "@preact/signals-react";  
+import { signal } from "@preact/signals";  
 const globalCount = signal(0);
 
 // component signals  

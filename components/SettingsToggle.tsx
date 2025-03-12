@@ -1,10 +1,11 @@
-import { useSignal } from "@preact/signals";
-import { autoFetchEnabled, toggleAutoFetch } from "@/lib/settings";
+import { useSignal, useComputed } from "@preact/signals";
+import { autoFetchEnabled, toggleAutoFetch, extractBaseDomain, isDomainWhitelisted, addDomainToWhitelist, removeDomainFromWhitelist } from "@/lib/settings";
 import { useEffect, useRef } from "preact/hooks";
 import CacheStats from "@/components/CacheStats";
 
 export function SettingsToggle() {
   const isOpen = useSignal(false);
+  const currentDomain = useSignal("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const toggleDropdown = () => {
@@ -14,6 +15,21 @@ export function SettingsToggle() {
   const handleAutoFetchToggle = async () => {
     await toggleAutoFetch();
   };
+
+  const isWhitelisted = useComputed(() => 
+    isDomainWhitelisted(currentDomain.value)
+  );
+
+  // Get current domain on mount and when dropdown opens
+  useEffect(() => {
+    if (isOpen.value) {
+      chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+        if (tab.url) {
+          currentDomain.value = extractBaseDomain(tab.url);
+        }
+      });
+    }
+  }, [isOpen.value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -27,6 +43,14 @@ export function SettingsToggle() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
+
+  const handleWhitelistToggle = async () => {
+    if (isWhitelisted.value) {
+      await removeDomainFromWhitelist(currentDomain.value);
+    } else {
+      await addDomainToWhitelist(currentDomain.value);
+    }
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -82,11 +106,42 @@ export function SettingsToggle() {
                 }`} />
               </label>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 mb-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
               {autoFetchEnabled.value
-                ? "Tweets will be automatically fetched when you visit a page."
+                ? "Tweets will be automatically fetched for whitelisted sites."
                 : "For privacy, tweets will only be fetched when you click the refresh button."}
             </p>
+
+            {/* Whitelist toggle for current site */}
+            {autoFetchEnabled.value && currentDomain.value && (
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate" title={currentDomain.value}>
+                      {currentDomain.value}
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer ml-3">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only"
+                      checked={isWhitelisted.value}
+                      onChange={handleWhitelistToggle}
+                    />
+                    <div className={`w-9 h-5 rounded-full transition ${
+                      isWhitelisted.value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                    } after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${
+                      isWhitelisted.value ? 'after:translate-x-4' : ''
+                    }`} />
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {isWhitelisted.value
+                    ? "Auto-fetch is enabled for this site"
+                    : "Auto-fetch is disabled for this site"}
+                </p>
+              </div>
+            )}
             
             {/* Cache Statistics */}
             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">

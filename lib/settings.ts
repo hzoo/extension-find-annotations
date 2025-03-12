@@ -39,4 +39,42 @@ export async function saveSetting<K extends keyof ExtensionSettings>(
 export async function toggleAutoFetch(): Promise<void> {
   autoFetchEnabled.value = !autoFetchEnabled.value;
   await saveSetting("autoFetchEnabled", autoFetchEnabled.value);
-} 
+}
+
+export const whitelistedDomains = signal<string[]>([]);
+
+export function extractBaseDomain(url: string): string {
+  try {
+    const { hostname } = new URL(url);
+    return hostname;
+  } catch {
+    return "";
+  }
+}
+
+export async function addDomainToWhitelist(domain: string) {
+  const currentDomains = whitelistedDomains.value;
+  if (!currentDomains.includes(domain)) {
+    whitelistedDomains.value = [...currentDomains, domain];
+    await chrome.storage.local.set({ whitelistedDomains: whitelistedDomains.value });
+  }
+}
+
+export async function removeDomainFromWhitelist(domain: string) {
+  const currentDomains = whitelistedDomains.value;
+  if (currentDomains.includes(domain)) {
+    whitelistedDomains.value = currentDomains.filter(d => d !== domain);
+    await chrome.storage.local.set({ whitelistedDomains: whitelistedDomains.value });
+  }
+}
+
+export function isDomainWhitelisted(domain: string): boolean {
+  return whitelistedDomains.value.includes(domain);
+}
+
+// Initialize whitelist from storage
+chrome.storage.local.get(['whitelistedDomains']).then((result) => {
+  if (result.whitelistedDomains) {
+    whitelistedDomains.value = result.whitelistedDomains;
+  }
+}); 

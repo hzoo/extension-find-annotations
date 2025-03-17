@@ -5,6 +5,7 @@
   "version": "0.0.2",
   "type": "module",
   "scripts": {
+    "site": "vite",
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",

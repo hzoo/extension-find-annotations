@@ -19,6 +19,21 @@ export function isTwitterStatusUrl(url: string): boolean {
   return /(twitter\.com|x\.com)\/\w+\/status\/\d+/i.test(url);
 }
 
+// Helper to check if a URL is any Twitter/X domain URL
+export function isAnyTwitterUrl(url: string): boolean {
+  return /(^|\.)twitter\.com|x\.com/i.test(url);
+}
+
+// Filter out Twitter/X links from an array of URLs
+export function filterOutTwitterLinks(urls: string[]): string[] {
+  return urls.filter(url => !isAnyTwitterUrl(url));
+}
+
+// Filter function to use with TweetUrl objects
+export function filterOutTwitterUrlObjects(urlObjects: TweetUrl[]): TweetUrl[] {
+  return urlObjects.filter(urlObj => !isAnyTwitterUrl(urlObj.expanded_url));
+}
+
 // Get cached tweets for a URL (only loads from localStorage when needed)
 export function getCachedTweets(url: string): TweetCacheEntry | undefined {
   // First check memory cache

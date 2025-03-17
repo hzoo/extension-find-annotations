@@ -18,14 +18,14 @@
   "dependencies": {
     "@preact/signals": "^2.0.1",
     "@supabase/supabase-js": "^2.49.1",
-    "@tailwindcss/vite": "^4.0.12",
+    "@tailwindcss/vite": "^4.0.14",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.1",
-    "@types/bun": "^1.2.4",
-    "@types/chrome": "^0.0.308",
+    "@types/bun": "^1.2.5",
+    "@types/chrome": "^0.0.309",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.2",
     "@wxt-dev/module-react": "^1.1.2",

@@ -1,35 +1,17 @@
 import { useSignal, useComputed } from "@preact/signals";
-import { autoFetchEnabled, toggleAutoFetch, extractBaseDomain, isDomainWhitelisted, addDomainToWhitelist, removeDomainFromWhitelist } from "@/lib/settings";
 import { useEffect, useRef } from "preact/hooks";
-import CacheStats from "@/components/CacheStats";
+import { ObsidianSettings } from "@/components/Obsidian/ObsidianSettings";
+import { TwitterSettings } from "@/components/Twitter/TwitterSettings";
+import { serviceRegistry, activeService } from "@/lib/services";
+import { ServiceType } from "@/lib/types";
 
 export function SettingsToggle() {
   const isOpen = useSignal(false);
-  const currentDomain = useSignal("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const toggleDropdown = () => {
     isOpen.value = !isOpen.value;
   };
-
-  const handleAutoFetchToggle = async () => {
-    await toggleAutoFetch();
-  };
-
-  const isWhitelisted = useComputed(() => 
-    isDomainWhitelisted(currentDomain.value)
-  );
-
-  // Get current domain on mount and when dropdown opens
-  useEffect(() => {
-    if (isOpen.value) {
-      chrome.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
-        if (tab.url) {
-          currentDomain.value = extractBaseDomain(tab.url);
-        }
-      });
-    }
-  }, [isOpen.value]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -44,13 +26,29 @@ export function SettingsToggle() {
     };
   }, [isOpen]);
 
-  const handleWhitelistToggle = async () => {
-    if (isWhitelisted.value) {
-      await removeDomainFromWhitelist(currentDomain.value);
-    } else {
-      await addDomainToWhitelist(currentDomain.value);
+  // Render service-specific settings
+  const renderServiceSettings = () => {
+    const currentService = activeService.value;
+    
+    switch (currentService) {
+      case ServiceType.OBSIDIAN:
+        return <ObsidianSettings />;
+      case ServiceType.TWITTER:
+        return <TwitterSettings />;
+      default:
+        return (
+          <div className="p-4">
+            <p className="text-sm text-gray-500">No specific settings for this service.</p>
+          </div>
+        );
     }
   };
+
+  // Get current service for dropdown title
+  const currentServiceName = useComputed(() => {
+    const service = serviceRegistry.getService(activeService.value);
+    return service?.name || "Settings";
+  });
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -84,70 +82,13 @@ export function SettingsToggle() {
 
       {/* Settings dropdown */}
       {isOpen.value && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-md shadow-lg z-20 border border-gray-200 dark:border-gray-700">
-          <div className="p-3">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Privacy Settings</h3>
-            <div className="flex items-center justify-between">
-              <label htmlFor="auto-fetch" className="text-sm text-gray-700 dark:text-gray-300">
-                Auto-fetch tweets for every page
-              </label>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  id="auto-fetch"
-                  className="sr-only"
-                  checked={autoFetchEnabled.value}
-                  onChange={handleAutoFetchToggle}
-                />
-                <div className={`w-9 h-5 rounded-full transition ${
-                  autoFetchEnabled.value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-                } after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${
-                  autoFetchEnabled.value ? 'after:translate-x-4' : ''
-                }`} />
-              </label>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              {autoFetchEnabled.value
-                ? "Tweets will be automatically fetched for whitelisted sites."
-                : "For privacy, tweets will only be fetched when you click the refresh button."}
-            </p>
-
-            {/* Whitelist toggle for current site */}
-            {autoFetchEnabled.value && currentDomain.value && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 truncate" title={currentDomain.value}>
-                      {currentDomain.value}
-                    </p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-3">
-                    <input 
-                      type="checkbox" 
-                      className="sr-only"
-                      checked={isWhitelisted.value}
-                      onChange={handleWhitelistToggle}
-                    />
-                    <div className={`w-9 h-5 rounded-full transition ${
-                      isWhitelisted.value ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-                    } after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all ${
-                      isWhitelisted.value ? 'after:translate-x-4' : ''
-                    }`} />
-                  </label>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  {isWhitelisted.value
-                    ? "Auto-fetch is enabled for this site"
-                    : "Auto-fetch is disabled for this site"}
-                </p>
-              </div>
-            )}
-            
-            {/* Cache Statistics */}
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <CacheStats />
-            </div>
+        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg overflow-hidden z-20 border border-gray-200 dark:border-gray-700 animate-slideDown">
+          <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 py-2 px-4">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              {currentServiceName} Settings
+            </h3>
           </div>
+          {renderServiceSettings()}
         </div>
       )}
     </div>

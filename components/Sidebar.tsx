@@ -1,62 +1,64 @@
 import { useSignalEffect } from "@preact/signals";
-import { useRef } from "preact/hooks";
 import { currentUrl } from "@/lib/messaging";
-import { LoadingTweetList } from "@/components/LoadingTweet";
+import { LoadingItemList } from "@/components/LoadingItem";
 import { ErrorMessage } from "@/components/ErrorMessage";
-import { TweetList } from "@/components/TweetList";
+import { ContentList } from "@/components/ContentList";
 import { SidebarHeader } from "@/components/SidebarHeader";
-import { EmptyTweets } from "@/components/EmptyTweets";
-import { tweets, loading, error, tweetsSourceUrl } from "@/lib/signals";
-import { fetchTweets, fetchTweetsImpl } from "@/lib/fetch";
+import { EmptyList } from "@/components/EmptyList";
+import { contentItems, loading, error, contentSourceUrl, fetchContentImpl } from "@/lib/services";
 import { autoFetchEnabled, extractBaseDomain, isDomainWhitelisted } from "@/lib/settings";
 import { TweetSourceNotification } from "@/components/TweetSourceNotification";
 import CacheStatus from "@/components/CacheStatus";
-import { getCachedTweets } from "@/lib/urlCache";
+import { useRef, useEffect } from "preact/hooks";
+
+// Simple debounce function
+const debounce = (fn: Function, ms = 300) => {
+	let timeoutId: ReturnType<typeof setTimeout>;
+	return function(...args: any[]) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => fn(...args), ms);
+	};
+};
 
 function SidebarBody() {
-	// Load tweets when URL changes, with debounce
+	// Create a debounced version of fetchContentImpl
+	const debouncedFetch = useRef(debounce(fetchContentImpl, 1000));
+	
+	// Load content when URL changes
 	useSignalEffect(() => {
 		const newUrl = currentUrl.value;
 		
 		if (newUrl) {
-			// First check if we have cached data
-			const cachedData = getCachedTweets(newUrl);
+			// Update content source URL
+			contentSourceUrl.value = newUrl;
 			
-			if (cachedData) {
-				// If we have cached data, update source and tweets
-				tweetsSourceUrl.value = newUrl;
-				tweets.value = cachedData.tweets;
-				error.value = null;
-			} else if (autoFetchEnabled.value && isDomainWhitelisted(extractBaseDomain(newUrl))) {
-				// Only fetch if auto-fetch is enabled AND domain is whitelisted
-				tweetsSourceUrl.value = newUrl;
-				fetchTweets();
+			// Only fetch if auto-fetch is enabled AND domain is whitelisted
+			if (autoFetchEnabled.value && isDomainWhitelisted(extractBaseDomain(newUrl))) {
+				debouncedFetch.current();
 			}
-			// If no cache and auto-fetch disabled or not whitelisted, user will see TweetSourceNotification
 		}
 	});
 
 	return (
 		<div className="flex-1 overflow-y-auto">
 			{loading.value ? (
-				<LoadingTweetList />
+				<LoadingItemList />
 			) : error.value ? (
 				<ErrorMessage message={error.value} />
 			) : (
-				<TweetList tweets={tweets.value} />
+				<ContentList />
 			)}
 		</div>
 	);
 }
 
 export function Sidebar() {
-	// Simplified structure without unnecessary background colors
 	return (
 		<div className="flex flex-col h-full">
 			<SidebarHeader />
 			<TweetSourceNotification />
 			<CacheStatus />
-			{tweets.value.length === 0 && !loading.value && <EmptyTweets />}
+			{contentItems.value.length === 0 && !loading.value && <EmptyList />}
 			<SidebarBody />
 		</div>
 	);

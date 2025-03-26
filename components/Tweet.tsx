@@ -2,7 +2,7 @@ import { useEffect } from "preact/hooks";
 import { useSignal } from "@preact/signals";
 import { memo } from "preact/compat";
 
-import {LoadingTweet} from "@/components/LoadingTweet";
+import { LoadingItem } from "@/components/LoadingItem";
 import { supabase } from "@/lib/supabase";
 import { getUserData, setUserData } from "@/lib/userCache";
 import type { TweetData, TweetType } from "@/lib/signals";
@@ -315,7 +315,7 @@ export const Tweet = memo(function TweetComponent({ tweet }: { tweet: ExtendedTw
     fetchUserData();
   }, [tweet.account_id, userData]);
 
-  if (!userData.value) return <LoadingTweet />;
+  if (!userData.value) return <LoadingItem />;
 
   const tweetUrl = `https://x.com/${userData.value.username}/status/${tweet.tweet_id}`;
   const formattedDate = formatTweetDate(tweet.created_at);

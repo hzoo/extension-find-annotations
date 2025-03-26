@@ -1,4 +1,4 @@
-import { addDomainToWhitelist, extractBaseDomain, isDomainWhitelisted } from "@/lib/settings";
+import { addDomainToWhitelist, extractBaseDomain } from "@/lib/settings";
 import { useSignal } from "@preact/signals";
 
 interface WhitelistButtonProps {

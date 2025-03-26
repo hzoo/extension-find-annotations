@@ -1,6 +1,6 @@
 import { memo } from "preact/compat";
 
-const LoadingTweet = memo(() => (
+const LoadingItem = memo(() => (
 	<div class="p-3 border-b border-gray-100 dark:border-gray-800">
 		<div class="flex gap-2">
 			<div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
@@ -13,12 +13,12 @@ const LoadingTweet = memo(() => (
 	</div>
 ));
 
-const LoadingTweetList = memo(() => (
+const LoadingItemList = memo(() => (
 	<div>
-		<LoadingTweet />
-		<LoadingTweet />
-		<LoadingTweet />
+		<LoadingItem />
+		<LoadingItem />
+		<LoadingItem />
 	</div>
 ));
 
-export { LoadingTweet, LoadingTweetList };
+export { LoadingItem, LoadingItemList };

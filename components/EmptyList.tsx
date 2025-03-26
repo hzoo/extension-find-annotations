@@ -3,7 +3,7 @@ import { ManualFetchButton } from "@/components/ManualFetchButton";
 import { WhitelistButton } from "@/components/WhitelistButton";
 import { useSignal, useComputed } from "@preact/signals";
 
-export function EmptyTweets() {
+export function EmptyList() {
   const currentDomain = useSignal("");
 
   // Get current domain on mount
@@ -39,28 +39,34 @@ export function EmptyTweets() {
       {autoFetchEnabled.value ? (
         <>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-            No tweets found
+            {isWhitelisted.value ? 
+              "This page is quiet" :
+              "Site needs whitelisting"
+            }
           </h3>
           {isWhitelisted.value ? (
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              We couldn't find any tweets for this page.
+              No discussions or annotations have been found yet. Be the first to start the conversation!
             </p>
           ) : (
             <>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Auto-fetch is enabled but this site isn't whitelisted. Add it to the whitelist to automatically fetch tweets.
+                To protect your privacy, we need permission to search for annotations.
               </p>
               <WhitelistButton />
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-4">
+                This will enable auto-fetch for all pages on {currentDomain.value}
+              </p>
             </>
           )}
         </>
       ) : (
         <>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
-            No tweets found
+            Ready to explore
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Auto-fetch is disabled. Click the button below to check for tweets on this page.
+            Discover what others are saying about this page. Click below to check for annotations.
           </p>
           <ManualFetchButton />
         </>
